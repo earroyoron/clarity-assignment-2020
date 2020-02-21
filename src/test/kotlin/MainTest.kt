@@ -10,7 +10,15 @@ class MainTest: StringSpec({
         connection.origin shouldBe "Madrid"
         connection.target shouldBe "Parla"
     }
+
+    "Failing test to check circle-CI" {
+        val connection = HostConnection(1L, "Madrid", "Parla")
+        connection.timestamp shouldBe 0L
+    }
+
 })
+
+
 
 data class HostConnection(val timestamp: Long,
                           val origin: String,
