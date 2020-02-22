@@ -1,22 +1,48 @@
 package io.earroyoron.clarity
 
+import io.earroyoron.clarity.Checks.*
+import java.io.File
+
 fun main(args: Array<String>) {
-    if (args.checkProvidedArguments() != Checks.Valid) {
-        println ("USAGE: inputfile.txt init_datetime end_datetime host")
+    when (val arguments  = args.checkProvidedArguments()) {
+        is InputParameters -> getConnectionsInPeriod(arguments).forEach{println(it)}
+        is InvalidNumberOfArguments -> println(
+            """
+             Use four arguments in parsing mode:
+             --args="inputfile init_datetime end_datetime host"
+            """)
+        InvalidTimeFormat -> println(
+            """
+             The init_datetime and end_datetime should be provided as milliseconds
+             --args="inputfile init_datetime end_datetime host"
+            """)
+        InvalidTimePeriod -> println(
+            """
+             init_datetime should be before end_datetime:
+             --args="inputfile init_datetime end_datetime host"
+            """)
     }
 }
 
-enum class Checks {
-    Valid, InvalidNumberOfArguments, InvalidTimeFormat, InvalidTimePeriod;
-}
 
-fun Array<String>.checkProvidedArguments(): Checks {
-        return if (this.size != 4)
-            Checks.InvalidNumberOfArguments
-        else if ( null == this[1].toLongOrNull() || null == this[2].toLongOrNull()  )
-            Checks.InvalidTimeFormat
-        else if ( this[1] > this[2] )
-            Checks.InvalidTimePeriod
-        else Checks.Valid
-}
+/**
+ * This function will return the list of the hosts(names)
+ * to the toHostname in the given period fromTimestamp-toTimestamp
+ */
+ fun getConnectionsInPeriod(input: InputParameters): List<String> {
+       return input.run {
+           File(filename).useLines {
+                   line -> line.map { it.toHostConnection() }
+               .filter { it.timestamp > fromTimestamp }
+               .filter { it.timestamp < toTimestamp }
+               .filter { it.target == toHostname }
+               .map { it.origin }
+               .toList()
+           }
+       }
+   }
+
+
+
+
 
