@@ -20,6 +20,10 @@ class MainTest: StringSpec({
         connection.target shouldBe "Cardenal"
     }
 
+    "Number of parameters to invoke" {
+        val args = arrayOf("inputfilename", "init_date", "end_date", "hostname")
+        validArguments(args) shouldBe true
+    }
 })
 
 
