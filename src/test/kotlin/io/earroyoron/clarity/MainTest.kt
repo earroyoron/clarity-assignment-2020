@@ -1,3 +1,5 @@
+package io.earroyoron.clarity
+
 import io.kotlintest.shouldBe
 import io.kotlintest.specs.StringSpec
 
@@ -20,11 +22,4 @@ class MainTest: StringSpec({
 
 })
 
-data class HostConnection(val timestamp: Long,
-                          val origin: String,
-                          val target: String)
 
-fun String.toHostConnection(): HostConnection {
-    val elements: List<String> = this.split(" ")
-    return HostConnection(elements[0].toLong(), elements[1], elements[2])
-}
