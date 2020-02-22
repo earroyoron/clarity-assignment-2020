@@ -20,5 +20,9 @@ fun Array<String>.checkProvidedArguments(): Checks {
         InvalidTimeFormat
     else if ( this[1] > this[2] )
         InvalidTimePeriod
-    else InputParameters(this[0], this[1].toLong(), this[2].toLong(), this[3])
+    else InputParameters(
+        filename = this[0],
+        fromTimestamp = this[1].toLong(),
+        toTimestamp = this[2].toLong(),
+        toHostname = this[3])
 }
