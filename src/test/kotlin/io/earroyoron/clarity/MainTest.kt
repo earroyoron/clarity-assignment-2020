@@ -5,25 +5,31 @@ import io.kotlintest.specs.StringSpec
 
 class MainTest: StringSpec({
 
-    "A Connection data class should have the needed properties" {
-        val connection = HostConnection(1L, "Madrid", "Parla")
-
-        connection.timestamp shouldBe 1L
-        connection.origin shouldBe "Madrid"
-        connection.target shouldBe "Parla"
+    "Number of parameters to invoke should be 4" {
+        val args = arrayOf("inputfilename", "2555", "8999", "hostname")
+        args.checkProvidedArguments() shouldBe Checks.Valid
     }
 
-    "Extension function should create a HostConnection" {
-        val connection = "1230 Abad Cardenal".toHostConnection()
-        connection.timestamp shouldBe 1230L
-        connection.origin shouldBe "Abad"
-        connection.target shouldBe "Cardenal"
+    "Three parameters should return error" {
+        val args = arrayOf("inputfilename", "init_date", "end_date")
+        args.checkProvidedArguments() shouldBe Checks.InvalidNumberOfArguments
     }
 
-    "Number of parameters to invoke" {
-        val args = arrayOf("inputfilename", "init_date", "end_date", "hostname")
-        validArguments(args) shouldBe true
+    "Second argument should be a Long" {
+        val args = arrayOf("inputfilename", "init_date", "87777", "hostname")
+        args.checkProvidedArguments() shouldBe Checks.InvalidTimeFormat
     }
+
+    "Third argument should be a Long" {
+        val args = arrayOf("inputfilename", "27888", "end_date", "hostname")
+        args.checkProvidedArguments() shouldBe Checks.InvalidTimeFormat
+    }
+
+    "Start should be before end in timing arguments" {
+        val args = arrayOf("inputfilename", "27888", "1233", "hostname")
+        args.checkProvidedArguments() shouldBe Checks.InvalidTimePeriod
+    }
+
 })
 
 
