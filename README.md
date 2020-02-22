@@ -1,6 +1,10 @@
 # clarityai-assignment
 Solution for Clarity-AI assignment
 
+[![CodeFactor](https://www.codefactor.io/repository/github/earroyoron/clarity-assignment-2020/badge/master)](https://www.codefactor.io/repository/github/earroyoron/clarity-assignment-2020/overview/master)
+
+[![earroyoron](https://circleci.com/gh/earroyoron/clarity-assignment-2020.svg?style=svg)](https://circleci.com/gh/earroyoron/clarity-assignment-2020)
+
 ## At a glance
 
 The project is built with Kotlin, no frameworks, 
@@ -40,14 +44,23 @@ in development.
 
     `./gradlew run --args="--tail input-file-10000.txt Mykenzi Olvin"`
 
+## Tools used 
+
+Some tools have been used to enforce a TDD and _simulate_ a "going to production from the 1st day" approach.
 ## Continuous Integration (Circle-CI)
 
-From the very first time the
-project was developed using a CI tool 
-to enforce a TDD and _simulate_ a "going to production from the 1st day"
-approach.
+From the very first time the project was developed using a CI tool 
 
 - https://app.circleci.com/github/earroyoron/clarity-assignment-2020/pipelines
+
+### Code Factor (Code Quality testing)
+
+A tool to check code quality and technical debt:
+
+- https://www.codefactor.io/repository/github/earroyoron/clarity-assignment-2020
+
+Note: I use "Sonar" but as is not free I included this tool 
+that I am not very used, but a code-review tool is a needed tool for a healthy project.
 
 ## Solution design notes
 
