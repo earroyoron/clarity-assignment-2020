@@ -11,15 +11,20 @@ class MainTest: StringSpec({
         connection.target shouldBe "Parla"
     }
 
-    "Failing test to check circle-CI" {
-        val connection = HostConnection(1L, "Madrid", "Parla")
-        connection.timestamp shouldBe 0L
+    "Extension function should create a HostConnection" {
+        val connection = "1230 Abad Cardenal".toHostConnection()
+        connection.timestamp shouldBe 1230L
+        connection.origin shouldBe "Abad"
+        connection.target shouldBe "Cardenal"
     }
 
 })
 
-
-
 data class HostConnection(val timestamp: Long,
                           val origin: String,
                           val target: String)
+
+fun String.toHostConnection(): HostConnection {
+    val elements: List<String> = this.split(" ")
+    return HostConnection(elements[0].toLong(), elements[1], elements[2])
+}
