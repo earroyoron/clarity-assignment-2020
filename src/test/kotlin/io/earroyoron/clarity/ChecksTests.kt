@@ -8,7 +8,7 @@ class ChecksTests: StringSpec({
 
     "Number of parameters to invoke should be 4" {
         val args = arrayOf("inputFilename", "2555", "8999", "hostname")
-        args.checkProvidedArguments() shouldBe  InputParameters("inputFilename",2555,8999,"hostname")
+        args.checkProvidedArguments() shouldBe  ParsingFileWithParameters("inputFilename",2555,8999,"hostname")
     }
 
     "Three parameters should return error" {
