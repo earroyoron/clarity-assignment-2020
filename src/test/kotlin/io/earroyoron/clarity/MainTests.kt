@@ -1,5 +1,6 @@
 package io.earroyoron.clarity
 
+import io.earroyoron.clarity.Checks.*
 import io.kotlintest.matchers.collections.shouldContainExactly
 import io.kotlintest.specs.StringSpec
 
@@ -7,7 +8,7 @@ class MainTests: StringSpec({
 
     "Test connectedInPeriodTo function" {
 
-        val arguments = Checks.ParsingFileWithParameters(
+        val arguments = ParsingFileWithParameters(
             filename = "./src/test/resources/input-file-10000.txt",
             fromTimestamp = 1565647204351,
             toTimestamp = 1565733598341,
