@@ -1,35 +1,34 @@
 package io.earroyoron.clarity
 
 import io.earroyoron.clarity.Checks.*
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.runBlocking
 import java.io.File
+import java.util.*
 
 fun main(args: Array<String>) {
+
     when (val arguments  = args.checkProvidedArguments()) {
+        is MonitoringFileWithParameters -> fileMonitoring(arguments)
         is ParsingFileWithParameters -> {
-            val results = connectionsToInPeriod(
+            connectionsToInPeriod(
                 filename = arguments.filename,
                 toHostname = arguments.toHostname,
                 fromTimestamp = arguments.fromTimestamp,
                 toTimestamp = arguments.toTimestamp)
-            results.forEach{ println(it) }
+            .forEach{ println(it) }
         }
-        is InvalidNumberOfArguments -> println(
+        else -> println(
             """
-             Use four arguments in parsing mode:
-             --args="inputfile init_datetime end_datetime host"
-            """)
-        is InvalidTimeFormat -> println(
-            """
-             The init_datetime and end_datetime should be provided as milliseconds
-             --args="inputfile init_datetime end_datetime host"
-            """)
-        is InvalidTimePeriod -> println(
-            """
-             init_datetime should be before end_datetime:
-             --args="inputfile init_datetime end_datetime host"
+             Usage:
+             --args="--parsing inputFile init_datetime end_datetime host"
+             or
+             --args="--tail inputFile from_host to_host"
             """)
     }
 }
+
 
 /**
  * This function will return the list of the hosts(names)
@@ -46,6 +45,11 @@ fun main(args: Array<String>) {
             .filter { it.target == toHostname }
             .map { it.origin }.toSet()
     }
+
+
+
+
+
 
 
 
