@@ -26,3 +26,6 @@ hs_err_pid*
 /.gradle/
 
 build/*
+/notas
+/.kotlintest/spec_failures
+/out/test/resources/input-file-10000.txt
