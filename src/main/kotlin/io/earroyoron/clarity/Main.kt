@@ -5,12 +5,21 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.runBlocking
 import java.io.File
-import java.util.*
+import kotlin.concurrent.timer
 
 fun main(args: Array<String>) {
 
     when (val arguments  = args.checkProvidedArguments()) {
-        is MonitoringFileWithParameters -> fileMonitoring(arguments)
+        is MonitoringFileWithParameters -> {
+            val stream: Flow<String> = File(arguments.filename).readLines().asFlow()
+            val fileMonitoring = FileMonitoring(arguments as MonitoringFileWithParameters, stream)
+            timer(
+                name = "PeriodicMonitor",
+                daemon = false,
+                period = 3000L,
+                action = { fileMonitoring.run() }
+            )
+        }
         is ParsingFileWithParameters -> {
             connectionsToInPeriod(
                 filename = arguments.filename,
