@@ -22,7 +22,7 @@ import kotlin.concurrent.withLock
  */
 class FileMonitoring(private val arguments: MonitoringFileWithParameters) {
 
-    fun subscribe() {
+    fun start() {
         val transferQueue: TransferQueue<String> = LinkedTransferQueue()
         val executor = Executors.newFixedThreadPool(2)
         val producer = Producer(transferQueue, arguments.filename)
@@ -36,13 +36,15 @@ class FileMonitoring(private val arguments: MonitoringFileWithParameters) {
         )
         executor.execute(producer)
         executor.execute(consumer)
-        executor.awaitTermination(5000, TimeUnit.MICROSECONDS)
+        executor.awaitTermination(5000, TimeUnit.MICROSECONDS) //actually never
         executor.shutdown()
     }
 }
 
 /**
  * Producer reading from file
+ * If consumer do not get the line in the timeout
+ * the back pressure policy is dropping it.
  */
 class Producer(
     private val transferQueue: TransferQueue<String>,
@@ -54,10 +56,10 @@ class Producer(
         while (true) {
             try {
                 val line = bufferedReader.readLine()
-                if (null != line) { //here we block for consumer with the TO
+                if (null != line) { //here we block for consumer with the TO of 500ms
                     transferQueue.tryTransfer(line, 500, TimeUnit.MILLISECONDS)
                 } else {
-                    Thread.sleep(5000) // producer sleeps
+                    Thread.sleep(5000) // producer sleeps for 5sec
                 }
             } catch (e: InterruptedException) {
                 e.printStackTrace()
@@ -74,23 +76,24 @@ class Consumer(private val transferQueue: TransferQueue<String>,
                private val fromHost: String,
                private val toHost: String) : TimerTask() {
 
-    /** with multiple consumers the access should be thread safe!*/
     private var toHostConnection = mutableListOf<String>()
     private var fromHostConnection = mutableListOf<String>()
     private var grouping = mutableMapOf<String, Int>()
 
     private val lock: Lock = ReentrantLock()
-    private val linesRead = AtomicInteger()
+    private val linesRead = AtomicInteger() // Counting read lines, for curiosity
 
     override fun run() {
         while (true) {
             val connection: HostConnection = transferQueue.take().toHostConnection()
-            linesRead.incrementAndGet()
+            linesRead.incrementAndGet() // Just for fun
             lock.withLock { // while updating we cannot print
-                if (connection.origin == fromHost) fromHostConnection.add(connection.target)
-                if (connection.target == toHost) toHostConnection.add(connection.origin)
-                val actual = grouping.getOrDefault(connection.origin, 0)
-                grouping[connection.origin] = actual + 1
+                connection.apply {
+                    if (origin == fromHost) fromHostConnection.add(target)
+                    if (target == toHost) toHostConnection.add(origin)
+                    val actual = grouping.getOrDefault(origin, 0)
+                    grouping[origin] = actual + 1
+                }
             }
         }
     }

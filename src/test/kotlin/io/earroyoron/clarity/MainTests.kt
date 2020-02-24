@@ -15,7 +15,7 @@ class MainTests: StringSpec({
             toHostname = "Porcha"
         )
 
-        val result = connectionsToInPeriod(
+        val result = connectionsToHostInPeriod(
             arguments.filename,
             arguments.toHostname,
             arguments.fromTimestamp,

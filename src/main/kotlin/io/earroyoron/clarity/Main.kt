@@ -14,19 +14,18 @@ private const val HELP = """
 fun main(args: Array<String>) {
 
     when (val arguments  = args.checkProvidedArguments()) {
-        is MonitoringFileWithParameters -> {
-            val fileMonitoring = FileMonitoring(arguments as MonitoringFileWithParameters)
-            fileMonitoring.subscribe()
-        }
+        is MonitoringFileWithParameters ->
+            FileMonitoring(arguments as MonitoringFileWithParameters).start()
 
         is ParsingFileWithParameters -> {
-            connectionsToInPeriod(
+            connectionsToHostInPeriod(
                 filename = arguments.filename,
                 toHostname = arguments.toHostname,
                 fromTimestamp = arguments.fromTimestamp,
                 toTimestamp = arguments.toTimestamp)
             .forEach{ println(it) }
         }
+
         else -> println(HELP)
     }
 }
@@ -36,10 +35,10 @@ fun main(args: Array<String>) {
  * This function will return the list of the hosts(names)
  * to the toHostname in the given period fromTimestamp-toTimestamp
  */
- fun connectionsToInPeriod (filename: String,
-                            toHostname: String,
-                            fromTimestamp: Long,
-                            toTimestamp: Long): Set<String> =
+ fun connectionsToHostInPeriod (filename: String,
+                                toHostname: String,
+                                fromTimestamp: Long,
+                                toTimestamp: Long): Set<String> =
     File(filename).useLines { line ->
         line.map { it.toHostConnection() }
             .filter { it.timestamp > fromTimestamp }
