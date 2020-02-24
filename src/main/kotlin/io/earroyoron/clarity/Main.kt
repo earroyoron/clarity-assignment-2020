@@ -1,25 +1,24 @@
 package io.earroyoron.clarity
 
-import io.earroyoron.clarity.Checks.*
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.runBlocking
+import io.earroyoron.clarity.Checks.MonitoringFileWithParameters
+import io.earroyoron.clarity.Checks.ParsingFileWithParameters
 import java.io.File
-import kotlin.concurrent.timer
+
+private const val HELP = """
+             Usage:
+             --args="--parsing inputFile init_datetime end_datetime host"
+             or
+             --args="--tail inputFile from_host to_host"
+            """
 
 fun main(args: Array<String>) {
 
     when (val arguments  = args.checkProvidedArguments()) {
         is MonitoringFileWithParameters -> {
-            val stream: Flow<String> = File(arguments.filename).readLines().asFlow()
-            val fileMonitoring = FileMonitoring(arguments as MonitoringFileWithParameters, stream)
-            timer(
-                name = "PeriodicMonitor",
-                daemon = false,
-                period = 3000L,
-                action = { fileMonitoring.run() }
-            )
+            val fileMonitoring = FileMonitoring(arguments as MonitoringFileWithParameters)
+            fileMonitoring.subscribe()
         }
+
         is ParsingFileWithParameters -> {
             connectionsToInPeriod(
                 filename = arguments.filename,
@@ -28,13 +27,7 @@ fun main(args: Array<String>) {
                 toTimestamp = arguments.toTimestamp)
             .forEach{ println(it) }
         }
-        else -> println(
-            """
-             Usage:
-             --args="--parsing inputFile init_datetime end_datetime host"
-             or
-             --args="--tail inputFile from_host to_host"
-            """)
+        else -> println(HELP)
     }
 }
 
