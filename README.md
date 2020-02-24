@@ -62,25 +62,51 @@ A tool to check code quality and technical debt:
 Note: I use "Sonar" but as is not free I included this tool 
 that I am not very used, but a code-review tool is a needed tool for a healthy project.
 
-## Solution design notes
+## Solution And Design notes
 
-To monitor the file I've choose a reactive approach
-where every new line is calculated just as it comes
-as a stream, presenting the results every hour
-but having them already calculated.
+The first task just use a Kotlin Sequence to improve the
+performance; using `File.useLines` we can get
+a Sequence and also the file is automatically closed.
 
-Other possible approach was using a microbatch style
-so the results are calculated every hour.
+The second task is a tipical Producer-Consumer problem
+when we should take care of a fast-producer and slow-Consumer
+so we have to be aware of backpressure with
+some interesting syncronization issues.
 
-It's a trade-off with memory, CPU and the time to
-have the results calculated, and maybe both are valid
-depending on circumstances or user requirements.
+My solution uses a different thread for both
+Producer and Consumer, and controls backpressure
+with a simple and classical JDK TransferQueue.
+(not Kotlin coroutines, as I tried use them but had problems
+with the context between them, and I could got a
+solution with that Kotlin feature,...
+I will keep trying with this for my own!)
+and I use the most simple option for control
+backpressure: will just drop messages from producer 
+if consumer is surpassed. 
+
+So the solution just calculate just-in-time
+the three metrics, and every hour we print
+the figures and set the three metrics to zero.
+But while we are "printing" we need and exclusive
+access (to avoid keep updating data while we prepare
+the results!)
+
+Note:
+
+I have assume for the second task that
+the timestamp of each line is useless and the
+tool just print "last-hour changes" in this log
+without checking this data; this could be changes
+if required, of course, but I thought the timestamp
+was needed only for the 1st task.
 
 ## Improvements / Pending / Known Issues
 
- - DateTime not provided as ms
+ - Use can provide the time period with DateTime and not ms.
+ - Allow multiple consumers (concurrent access to the metrics)
  
 # References 
 
 - More on atomic commits: [One Commit. One Change](https://medium.com/@fagnerbrack/one-commit-one-change-3d10b10cebbf)
+
 
