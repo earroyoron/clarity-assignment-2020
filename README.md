@@ -30,23 +30,37 @@ my practice of doing "atomic commits"
 and "Test Driven Development" with baby-steps
 in development.
 
-- build the project 
+Build the project with: 
 
 `./gradlew build`
 
-- you can run the project with gradlew run, 
+### Running
 
-  - to use the tool in "parsing" mode for a file use `--parse` as:`
+You can also run the project with gradlew: 
 
-    `./gradlew run --args="--parse input-file-10000.txt 1565647204351 1565733598341 Olvin"`
+#### Parsing a file (task 1)
 
-  - or using in "tail" mode where the file keeps monitored using `--tail` as:
+To run the tool in "parsing" mode for a file use `--parse` as the first argument as in this example:
 
-    `./gradlew run --args="--tail input-file-10000.txt Mykenzi Olvin"`
+    `./gradlew run --args="--parse src/test/resources/input-file-10000.txt 1565647204351 1565733598341 Olvin"`
 
-## Tools used 
+The tool shows the report and exits.
 
-Some tools have been used to enforce a TDD and _simulate_ a "going to production from the 1st day" approach.
+#### Monitoring a file (task 2)
+
+To run the tool in "tail" mode where the file keeps monitored use `--tail` as this other example:
+
+    `./gradlew run --args="--tail src/test/resources/input-file-10000.txt Mykenzi Olvin"`
+
+After the first execution or analysis we will
+start waiting the required hour for the next report, 
+as required in the instructions.
+
+# Good practices in development: tools 
+
+Some tools have been used to enforce a TDD and _simulate_ a
+"going to production from the 1st day" approach.
+
 ## Continuous Integration (Circle-CI)
 
 From the very first time the project was developed using a CI tool 
@@ -62,30 +76,30 @@ A tool to check code quality and technical debt:
 Note: I use "Sonar" but as is not free I included this tool 
 that I am not very used, but a code-review tool is a needed tool for a healthy project.
 
-## Solution And Design notes
+# Solution And Design notes
 
 The first task just use a Kotlin Sequence to improve the
 performance; using `File.useLines` we can get
 a Sequence and also the file is automatically closed.
 
-The second task is a tipical Producer-Consumer problem
+The second task is a typical **Producer-Consumer problem**
 when we should take care of a fast-producer and slow-Consumer
-so we have to be aware of backpressure with
-some interesting syncronization issues.
+so we have to be aware of **back-pressure** with
+some interesting synchronization issues.
 
 My solution uses a different thread for both
-Producer and Consumer, and controls backpressure
+Producer and Consumer, and controls back-pressure
 with a simple and classical JDK TransferQueue.
 (not Kotlin coroutines, as I tried use them but had problems
 with the context between them, and I could got a
 solution with that Kotlin feature,...
 I will keep trying with this for my own!)
 and I use the most simple option for control
-backpressure: will just drop messages from producer 
+back-pressure: will just drop messages from producer 
 if consumer is surpassed. 
 
 So the solution just calculate just-in-time
-the three metrics, and every hour we print
+the three metrics(*), and every hour we print
 the figures and set the three metrics to zero.
 But while we are "printing" we need and exclusive
 access (to avoid keep updating data while we prepare
