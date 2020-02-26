@@ -87,6 +87,8 @@ when we should take care of a fast-producer and slow-Consumer
 so we have to be aware of **back-pressure** with
 some interesting synchronization issues.
 
+(see below my notes about the posible improvements)
+
 My solution uses a different thread for both
 Producer and Consumer, and controls back-pressure
 with a simple and classical JDK TransferQueue.
@@ -117,10 +119,19 @@ was needed only for the 1st task.
 ## Improvements / Pending / Known Issues
 
  - Use can provide the time period with DateTime and not ms.
+ 
  - Allow multiple consumers (concurrent access to the metrics)
+ and maybe using a **map-reduce** (each consumer did their metrics and
+ when we need the report we reduce all)
+ 
+ - Implement the problem with some reactive-streams framework
+ (JavaRx, Reactor, Akka Streams,...) as my solution is a very 
+ simple approach that do not fully comply with that specification.
  
 # References 
 
 - More on atomic commits: [One Commit. One Change](https://medium.com/@fagnerbrack/one-commit-one-change-3d10b10cebbf)
+- http://www.reactive-streams.org/
+
 
 
