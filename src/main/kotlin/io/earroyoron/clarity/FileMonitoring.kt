@@ -54,9 +54,9 @@ class FileMonitoring(val arguments: MonitoringFileWithParameters) {
         println ("---REPORT--- (${linesRead.getAndSet(0)} lines processed)")
         lock.withLock { // while printing we cannot update
             with(metrics) {
-                print("1) Connections to $arguments.toHost: ")
+                print("1) Connections to ${arguments.connectionsTo}: ")
                 println(this.getJoinedToHostConnection())
-                print("2) Connections from $arguments.fromHost: ")
+                print("2) Connections from ${arguments.connectionsFrom}: ")
                 println(this.getJoinedFromHostConnection())
                 print("3) Most connected: ")
                 println(this.getMaxOrigin())
