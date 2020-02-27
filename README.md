@@ -78,16 +78,15 @@ that I am not very used, but a code-review tool is a needed tool for a healthy p
 
 # Solution And Design notes
 
-The first task just use a Kotlin Sequence to improve the
+The first task just use a _Kotlin Sequence_ to improve the
 performance; using `File.useLines` we can get
 a Sequence and also the file is automatically closed.
 
 The second task is a typical **Producer-Consumer problem**
-when we should take care of a fast-producer and slow-Consumer
-so we have to be aware of **back-pressure** with
-some interesting synchronization issues.
+when we should take care of a fast-producer and a slow-Consumer
+so we have to be aware of **back-pressure**.
 
-(see below my notes about the posible improvements)
+(see below my notes about the possible improvements)
 
 My solution uses a different thread for both
 Producer and Consumer, and controls back-pressure
@@ -124,8 +123,9 @@ was needed only for the 1st task.
  and maybe using a **map-reduce** (each consumer did their metrics and
  when we need the report we reduce all)
  
- - Implement the problem with some reactive-streams framework
- (JavaRx, Reactor, Akka Streams,...) as my solution is a very 
+ - Implement the problem with the reactive-streams API
+ and a framework that implements it: JavaRx, Reactor, Akka Streams,...
+ Actually my solution is a very 
  simple approach that do not fully comply with that specification.
  
 # References 

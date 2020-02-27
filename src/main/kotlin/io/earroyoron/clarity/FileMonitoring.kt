@@ -14,14 +14,13 @@ import kotlin.concurrent.withLock
 /**
  * Implements a Producer-Consumer pattern with back-pressure
  * using a simple TransferQueue.
- * A more complex solution could use the Reactive API
+ *
+ * A more complex solution could use the Reactive API (Flow)
  * and some complete reactive implementation (RxJava,Reactor,...)
  */
 class FileMonitoring(val arguments: MonitoringFileWithParameters) {
 
-    var toHostConnection = mutableListOf<String>()
-    var fromHostConnection = mutableListOf<String>()
-    var grouping = mutableMapOf<String, Int>()
+    var metrics = Metrics()
 
     val lock: Lock = ReentrantLock()
     val linesRead = AtomicInteger() // Counting read lines, for curiosity
@@ -51,19 +50,19 @@ class FileMonitoring(val arguments: MonitoringFileWithParameters) {
      * Monitor and empty results, called by a scheduler timer from the
      * main coordinator
      */
-    fun reporting() {
+    private fun reporting() {
         println ("---REPORT--- (${linesRead.getAndSet(0)} lines processed)")
         lock.withLock { // while printing we cannot update
-            print("1) Connections to $arguments.toHost: ")
-            println(toHostConnection.joinToString(","))
-            toHostConnection = mutableListOf()
-            print("2) Connections from $arguments.fromHost: ")
-            println(fromHostConnection.joinToString(","))
-            fromHostConnection = mutableListOf()
-            print("3) Most connected: ")
-            println(grouping.toList().maxBy { it.second })
-            grouping = mutableMapOf()
-            println("---END REPORT--- next report in 1h")
+            with(metrics) {
+                print("1) Connections to $arguments.toHost: ")
+                println(this.getJoinedToHostConnection())
+                print("2) Connections from $arguments.fromHost: ")
+                println(this.getJoinedFromHostConnection())
+                print("3) Most connected: ")
+                println(this.getMaxOrigin())
+                println("---END REPORT--- next report in 1h")
+            }
+            metrics = Metrics() // just instantiate a new object
             println()
         }
     }
@@ -108,16 +107,20 @@ class Consumer(private val fileMonitoring: FileMonitoring) : TimerTask() {
                 val connection: HostConnection = fileMonitoring.transferQueue.take().toHostConnection()
                 fileMonitoring.linesRead.incrementAndGet() // Just for fun
                 fileMonitoring.lock.withLock {
-                    // while updating we cannot print
-                    connection.apply {
-                        if (origin == fileMonitoring.arguments.fromHost) fileMonitoring.fromHostConnection.add(target)
-                        if (target == fileMonitoring.arguments.toHost) fileMonitoring.toHostConnection.add(origin)
-                        val actual = fileMonitoring.grouping.getOrDefault(origin, 0)
-                        fileMonitoring.grouping[origin] = actual + 1
-                    }
-            }
+                    fileMonitoring.metrics.incrementMeasures(connection, fileMonitoring.arguments)
+                }
+//                    connection.apply {
+//                        if (origin == fileMonitoring.arguments.fromHost) fileMonitoring.metrics.fromHostConnection.add(target)
+//                        if (target == fileMonitoring.arguments.toHost) fileMonitoring.metrics.toHostConnection.add(origin)
+//                        val actual = fileMonitoring.metrics.grouping.getOrDefault(origin, 0)
+//                        fileMonitoring.metrics.grouping[origin] = actual + 1
+//                    }
+
+
         }
     }
+
+
 
 
 }

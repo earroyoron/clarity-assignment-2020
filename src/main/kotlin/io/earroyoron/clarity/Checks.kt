@@ -12,8 +12,8 @@ sealed class Checks {
                                          val toTimestamp: Long,
                                          val toHostname: String) : Checks()
     data class MonitoringFileWithParameters(val filename: String,
-                                            val fromHost: String,
-                                            val toHost: String) : Checks()
+                                            val connectionsFrom: String,
+                                            val connectionsTo: String) : Checks()
     object InvalidArguments: Checks()
     object InvalidTimeFormat: Checks()
     object InvalidTimePeriod: Checks()
@@ -47,7 +47,7 @@ fun Array<String>.getParsingParameters(): Checks =
 fun Array<String>.getMonitoringParameters(): Checks =
     MonitoringFileWithParameters(
         filename = this[1],
-        fromHost = this[2],
-        toHost = this[3]
+        connectionsFrom = this[2],
+        connectionsTo = this[3]
        )
 
