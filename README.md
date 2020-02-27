@@ -52,6 +52,9 @@ To run the tool in "tail" mode where the file keeps monitored use `--tail` as th
 
     `./gradlew run --args="--tail src/test/resources/input-file-10000.txt Mykenzi Olvin"`
 
+**FIRST REPORT IS PRINTED AFTER A DELAY, AS THE STREAM OF
+DATA IS CONSUMED JUST-IN-TIME NOT AS MICROBATCH**
+
 After the first execution or analysis we will
 start waiting the required hour for the next report, 
 as required in the instructions.
