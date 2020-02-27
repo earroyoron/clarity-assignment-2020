@@ -24,8 +24,8 @@ sealed class Checks {
  */
 fun Array<String>.checkProvidedArguments(): Checks {
     return when {
-        ((this[0] == "--tail") && (this.size == 4)) -> this.getMonitoringParameters()
-        ((this[0] == "--parse") && (this.size == 5))-> this.getParsingParameters()
+        this[0] == "--tail" && this.size == 4 -> this.getMonitoringParameters()
+        this[0] == "--parse" && this.size == 5-> this.getParsingParameters()
         else -> InvalidArguments
     }
 }
